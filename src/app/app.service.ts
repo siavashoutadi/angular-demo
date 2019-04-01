@@ -1,18 +1,21 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Subscription } from "rxjs";
 import { Product } from "./models/product.model";
+import { environment } from "../environments/environment.prod";
+import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class AppService {
     products = new BehaviorSubject<Product[]>(undefined);
     subscription: Subscription;
+    items: Product[];
 
-    items: Product[] = [
-        new Product('1', 'Pen', 10, 5, ''),
-        new Product('2', 'Pencil', 5, 1, '')
-    ]
+    constructor(private httpClient: HttpClient) { }
 
     onGetProducts() {
-        this.products.next(this.items);
+        this.httpClient.get<Product[]>(environment.apiUrl + "/products")
+            .subscribe((data: Product[]) => {
+                this.products.next(data);
+            });
     }
 }
